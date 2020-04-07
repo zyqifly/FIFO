@@ -27,7 +27,7 @@ int main()
         while (myServer->connectStatus)
         {
             myServer->read();
-            //myServer->send();
+            myServer->send();
         }
         myServer->closeServer();
     }

@@ -16,6 +16,8 @@ int main()
     {
         myClient->send();
         Sleep(1000);
+        myClient->read();
+        
     }
     return 0;
     

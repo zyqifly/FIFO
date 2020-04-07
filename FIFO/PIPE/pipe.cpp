@@ -63,7 +63,16 @@ bool	pipeServer::send()
     }
     char buf[] = "read ok!";
     DWORD   wlen = 0;
-    WriteFile(hPipe, buf, sizeof(buf), &wlen, 0);
+    bool    ret = WriteFile(hPipe, buf, sizeof(buf), &wlen, 0);
+    if (ret)
+    {
+        cout << "发送成功！" << endl;
+    }
+    else
+    {
+        cout << "发送失败！" << endl;
+    }
+    
     return  true;
 }
 
@@ -74,6 +83,7 @@ pipeClient::pipeClient()
     if (ConnectNamedPipe(hPipe, NULL) == TRUE)//
     {
         cout << "Connected!" << endl;
+        this->connectStatus = true;
     }
 }
 
@@ -95,10 +105,18 @@ bool	pipeClient::read()
         return  false;
     }
     char buf[256] = "Hello Pipe";
-    DWORD wlen = 0;
-    WriteFile(hPipe, buf, sizeof(buf), &wlen, 0);
-    cout << "Send:" << buf << endl;
-    Sleep(1000);   
+    DWORD rlen = 0;
+    if (ReadFile(hPipe, buf, 256, &rlen, NULL) == FALSE)//读取管道中的内容（管道是一种特殊的文件）
+    {
+        //CloseHandle(hPipe);//关闭管道
+        //connectStatus = false;
+        //return  false;
+    }
+    else
+    {
+        cout << "Rcv:" << buf << endl;
+    }
+          
     return  true;
 }
 bool	pipeClient::send()
