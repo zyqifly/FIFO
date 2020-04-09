@@ -6,10 +6,12 @@ pipeServer::pipeServer()
         
     }
     cout << "pipe Server connected!"<<endl;
-    connectStatus = true;
     hPipe = CreateFile(this->pipe_name, GENERIC_READ | GENERIC_WRITE, 0,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    Sleep(1000);
+    if (hPipe!=NULL)
+    {
+        connectStatus = true;
+    }
 }
 
 pipeServer::~pipeServer()
@@ -22,10 +24,14 @@ pipeServer::pipeServer(LPCWSTR pipe_name)
    
     }
     cout << "pipe Server connected!" << endl;
-    connectStatus = true;
     hPipe = CreateFile(pipe_name, GENERIC_READ | GENERIC_WRITE, 0,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    this->pipe_name = pipe_name;
+    if (hPipe!=NULL)
+    {
+        connectStatus = true;
+        this->pipe_name = pipe_name;
+    }
+    
 }
 void	pipeServer::closeServer()
 {
@@ -45,8 +51,8 @@ bool	pipeServer::read()
     DWORD rlen = 0;
     if (ReadFile(hPipe, buf, 256, &rlen, NULL) == FALSE)//读取管道中的内容（管道是一种特殊的文件）
     {
-        CloseHandle(hPipe);//关闭管道
-        connectStatus = false;
+        //CloseHandle(hPipe);//关闭管道
+        //connectStatus = false;
         return  false;
     }
     else
@@ -70,6 +76,7 @@ bool	pipeServer::send()
     }
     else
     {
+        return  false;
         cout << "发送失败！" << endl;
     }
     
@@ -78,13 +85,18 @@ bool	pipeServer::send()
 
 pipeClient::pipeClient()
 {
-    hPipe = CreateNamedPipe(TEXT("\\\\.\\Pipe\\mypipe"), PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
-        , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_WAIT_FOREVER, 0);//创建了一个命名管道
-    if (ConnectNamedPipe(hPipe, NULL) == TRUE)//
-    {
-        cout << "Connected!" << endl;
-        this->connectStatus = true;
-    }
+    //hPipe = CreateNamedPipe(this->pipe_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
+    //    , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_NOWAIT, 0);//创建了一个命名管道
+    //if (ConnectNamedPipe(hPipe, NULL) == TRUE)//
+    //{
+    //    cout << "Connected!" << endl;
+    //    this->connectStatus = true;
+    //}
+    //else
+    //{
+    //    cout << "Connected failed!" << endl;
+    //    this->connectStatus = false;
+    //}
 }
 
 pipeClient::~pipeClient()
@@ -121,6 +133,10 @@ bool	pipeClient::read()
 }
 bool	pipeClient::send()
 {
+    if (!connectStatus)
+    {
+        return  false;
+    }
     char buf[256] = "Hello Pipe";
     DWORD wlen = 0;
     bool    ret = false;
@@ -128,15 +144,35 @@ bool	pipeClient::send()
     cout << "Send:" << buf << endl;
     return  true;
 }
-
-pipeClient::pipeClient(LPCWSTR pipe_name)
+void	pipeClient::connect()
 {
-    hPipe = CreateNamedPipe(pipe_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
-        , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_WAIT_FOREVER, 0);//创建了一个命名管道
+    hPipe = CreateNamedPipe(this->pipe_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
+        , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_NOWAIT, 0);//创建了一个命名管道
     if (ConnectNamedPipe(hPipe, NULL) == TRUE)//
     {
         cout << "Connected!" << endl;
         this->connectStatus = true;
     }
-    this->pipe_name = pipe_name;
+    else
+    {
+        cout << "Connected failed!" << endl;
+        this->connectStatus = false;
+    }
+}
+pipeClient::pipeClient(LPCWSTR pipe_name)
+{
+    hPipe = CreateNamedPipe(pipe_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
+        , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_WAIT_FOREVER, 0);//创建了一个命名管道
+    if (ConnectNamedPipe(hPipe, NULL) == TRUE)//一直等待，直到同名的管道创建。
+    {
+        cout << "Connected!" << endl;
+        this->pipe_name = pipe_name;
+        this->connectStatus = true;
+    }
+    else
+    {
+        cout << "Connected failed!" << endl;
+        this->connectStatus = false;
+    }
+    
 }

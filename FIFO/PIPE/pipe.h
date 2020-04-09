@@ -34,6 +34,7 @@ public:
 	bool	read();
 	bool	send();
 	bool	connectStatus = false;
+	void	connect();
 
 private:
 	HANDLE hPipe = NULL;

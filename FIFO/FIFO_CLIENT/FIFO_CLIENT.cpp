@@ -7,13 +7,20 @@ using namespace std;
 #include<windows.h>
 #include<ctime>
 using namespace std;
+#include <thread>
 
 
 int main()
 {
-    pipeClient* myClient = new pipeClient();
+    pipeClient* myClient = new   pipeClient();/* = new pipeClient(TEXT("\\\\.\\Pipe\\mypipe"));*/
+    thread t(&pipeClient::connect, myClient);
     while (true)
     {
+        if (!myClient->connectStatus)
+        {
+            //myClient = new pipeClient(TEXT("\\\\.\\Pipe\\mypipe"));
+            continue;
+        }
         myClient->send();
         Sleep(1000);
         myClient->read();
