@@ -7,6 +7,7 @@
 #include<iostream>
 #include<windows.h>
 #include<ctime>
+#include <thread>
 using namespace std;
 
 int main()
@@ -22,14 +23,16 @@ int main()
         {
             break;
         }
-        LPCWSTR NAME = TEXT("\\\\.\\Pipe\\mypipe");
-        pipeServer* myServer = new   pipeServer(NAME);
+        pipeServer* myServer = new   pipeServer();
+        thread t(&pipeServer::connect, myServer);
         while (myServer->connectStatus)
         {
-            myServer->read();
-            myServer->send();
+            char    data[256] = "hello pipe!";
+            myServer->read(data);
+            char data1[256] = "recieved!";
+            myServer->send(data1);
         }
-        myServer->closeServer();
+        myServer->close();
     }
     cout << "已经退出！" << endl;
     return 0;

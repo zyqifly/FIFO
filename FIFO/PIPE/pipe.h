@@ -4,40 +4,43 @@ using	namespace std;
 #include<iostream>
 #include<windows.h>
 #include<ctime>
-class pipeServer
+class pipeBase
+{
+public:
+	pipeBase();
+	~pipeBase();
+	virtual	bool	read(char	buf[]);
+	virtual	bool	send(char	buf[]);
+	virtual	void	close();
+	virtual	void	connect();
+	bool	connectStatus = false;
+	LPCWSTR pipe_name = TEXT("\\\\.\\Pipe\\mypipe");
+	HANDLE hPipe = NULL;
+
+};
+
+
+class pipeServer : public	pipeBase
 {
 public:
 	pipeServer();
 	~pipeServer();
 	pipeServer(LPCWSTR pipe_name);
-	LPCWSTR pipe_name = TEXT("\\\\.\\Pipe\\mypipe");
-	void	closeServer();
-	bool	read();
-	bool	send();
-	bool	connectStatus = false;
-
-private:
-	HANDLE hPipe = NULL;
+	void	connect();
 	
 };
 
 
 
-class pipeClient
+class pipeClient: public	pipeBase
 {
 public:
 	pipeClient();
 	~pipeClient();
 	pipeClient(LPCWSTR pipe_name);
-	LPCWSTR pipe_name = TEXT("\\\\.\\Pipe\\mypipe");
-	void	closeClient();
-	bool	read();
-	bool	send();
-	bool	connectStatus = false;
 	void	connect();
 
-private:
-	HANDLE hPipe = NULL;
-
 };
+
+
 

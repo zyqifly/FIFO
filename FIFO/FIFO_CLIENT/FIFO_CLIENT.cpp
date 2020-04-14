@@ -16,46 +16,31 @@ int main()
     thread t(&pipeClient::connect, myClient);
     while (true)
     {
-        if (!myClient->connectStatus)
+        int a = 0;
+        cout << "输入1继续。。。" << endl;
+        cin >> a;
+        if (a!=1)
         {
-            //myClient = new pipeClient(TEXT("\\\\.\\Pipe\\mypipe"));
+            myClient->close();
+            break;
+        }
+        if (!myClient->connectStatus)//如果一开始没连接上，那就一直等待
+        {
             continue;
         }
-        myClient->send();
+        char    data[] = "hello Pipe!";
+        myClient->send(data);
         Sleep(1000);
-        myClient->read();
+        char    data1[256] = {};
+        myClient->read(data1);
+        if (!myClient->connectStatus)
+        {
+            cout << "连接已经断开，自动重连。。。。" << endl;
+            myClient->connect();
+        }
         
     }
+    cout << "退出" << endl;
     return 0;
-    
-    
-    HANDLE hPipe = CreateNamedPipe(TEXT("\\\\.\\Pipe\\mypipe"), PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
-        , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_WAIT_FOREVER, 0);//创建了一个命名管道
-    if (ConnectNamedPipe(hPipe, NULL) == TRUE)//
-    {
-        cout << "Connected!" << endl;
-    }
-
-    char buf[256] = "Hello Pipe";
-    DWORD wlen = 0;
-
-    while (1)
-    {
-        WriteFile(hPipe, buf, sizeof(buf), &wlen, 0);
-        cout << "Send:" << buf << endl;
-        Sleep(1000);
-        //DWORD rlen = 0;
-        //if (ReadFile(hPipe, buf, 256, &rlen, NULL) == FALSE)//读取管道中的内容（管道是一种特殊的文件）
-        //{
-        //    CloseHandle(hPipe);//关闭管道
-        //    //connectStatus = false;
-        //    return  false;
-        //}
-        //else
-        //{
-        //    cout << "Rcv:" << buf << endl;
-        //}
-    }
-    return 1;
 }
 
