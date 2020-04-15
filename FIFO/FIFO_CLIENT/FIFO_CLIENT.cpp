@@ -13,7 +13,8 @@ using namespace std;
 int main()
 {
     pipeClient* myClient = new   pipeClient();/* = new pipeClient(TEXT("\\\\.\\Pipe\\mypipe"));*/
-    thread t(&pipeClient::connect, myClient);
+    //thread t(&pipeClient::connect, myClient);
+    myClient->connect();
     while (true)
     {
         int a = 0;
@@ -22,17 +23,21 @@ int main()
         if (a!=1)
         {
             myClient->close();
-            break;
+            return  0;
         }
         if (!myClient->connectStatus)//如果一开始没连接上，那就一直等待
         {
             continue;
         }
-        char    data[] = "hello Pipe!";
-        myClient->send(data);
-        Sleep(1000);
-        char    data1[256] = {};
-        myClient->read(data1);
+        else
+        {
+            char    data[] = "hello Pipe!";
+            myClient->send(data);
+            Sleep(1000);
+            char    data1[256] = {};
+            myClient->read(data1);
+        }
+       
         if (!myClient->connectStatus)
         {
             cout << "连接已经断开，自动重连。。。。" << endl;

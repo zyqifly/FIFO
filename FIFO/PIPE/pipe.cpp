@@ -9,18 +9,6 @@ pipeBase::~pipeBase()
 }
 pipeServer::pipeServer()
 {
-    while (WaitNamedPipe(this->pipe_name, NMPWAIT_WAIT_FOREVER) == FALSE)
-    {
-        
-    }
-    cout << "pipe Server connected!"<<endl;
-    this->hPipe = CreateFile(this->pipe_name, GENERIC_READ | GENERIC_WRITE, 0,
-        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    
-    if (this->hPipe!=NULL)
-    {
-        connectStatus = true;
-    }
 }
 
 pipeServer::~pipeServer()
@@ -32,21 +20,23 @@ pipeServer::pipeServer(LPCWSTR pipe_name)
     
 }
 
-void	pipeServer::connect()
+bool	pipeServer::connect()
 {
     //由于是个死循环，可以放到另一个线程
     while (WaitNamedPipe(pipe_name, NMPWAIT_WAIT_FOREVER) == FALSE)
     {
-
+        //cout << "wait。。。。。" << endl;
     }
-    cout << "pipe Server connected!" << endl;
+    
     this->hPipe = CreateFile(pipe_name, GENERIC_READ | GENERIC_WRITE, 0,
         NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
     if (this->hPipe != NULL)
     {
         connectStatus = true;
-        this->pipe_name = pipe_name;
+        //this->pipe_name = pipe_name;
     }
+    cout << "pipe Server connected!" << endl;
+    return true;
 }
 
 
@@ -63,7 +53,7 @@ pipeClient::~pipeClient()
 
 
 
-void	pipeClient::connect()
+bool	pipeClient::connect()
 {
     hPipe = CreateNamedPipe(this->pipe_name, PIPE_ACCESS_DUPLEX, PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT
         , PIPE_UNLIMITED_INSTANCES, 0, 0, NMPWAIT_NOWAIT, 0);//创建了一个命名管道
@@ -78,6 +68,7 @@ void	pipeClient::connect()
         cout << "Connected failed!" << endl;
         this->connectStatus = false;
     }
+    return  true;
 }
 pipeClient::pipeClient(LPCWSTR pipe_name)
 {
@@ -95,7 +86,7 @@ bool	pipeBase::read(char buf[])//接收数据，并计数
     DWORD rlen = 0;
     if (ReadFile(hPipe, buf, 256, &rlen, NULL) == FALSE)//读取管道中的内容（管道是一种特殊的文件）
     {
-        CloseHandle(hPipe);//关闭管道
+        //CloseHandle(hPipe);//关闭管道
         connectStatus = false;
         return  false;
     }
@@ -117,7 +108,7 @@ bool	pipeBase::send(char buf[])//数组里面的数据全发送
     ret = WriteFile(hPipe, buf, sizeof(buf), &wlen, 0);
     if (!ret)
     {
-        CloseHandle(hPipe);//关闭管道
+        //CloseHandle(hPipe);//关闭管道
         connectStatus = false;
         return  false;
     }
@@ -128,12 +119,12 @@ void	pipeBase::close()
 {
     if (connectStatus)
     {
-        CloseHandle(this->hPipe);//关闭管道
+        //CloseHandle(this->hPipe);//关闭管道
         connectStatus = false;
         cout << "已经关闭!" << endl;
     }
 }
-void	pipeBase::connect()
+bool	pipeBase::connect()
 {
-    return;
+    return false;
 }

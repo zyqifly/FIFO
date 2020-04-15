@@ -12,7 +12,7 @@ public:
 	virtual	bool	read(char	buf[]);
 	virtual	bool	send(char	buf[]);
 	virtual	void	close();
-	virtual	void	connect();
+	virtual	bool	connect();
 	bool	connectStatus = false;
 	LPCWSTR pipe_name = TEXT("\\\\.\\Pipe\\mypipe");
 	HANDLE hPipe = NULL;
@@ -26,7 +26,7 @@ public:
 	pipeServer();
 	~pipeServer();
 	pipeServer(LPCWSTR pipe_name);
-	void	connect();
+	virtual	bool	connect();
 	
 };
 
@@ -38,7 +38,7 @@ public:
 	pipeClient();
 	~pipeClient();
 	pipeClient(LPCWSTR pipe_name);
-	void	connect();
+	virtual	bool	connect();
 
 };
 
