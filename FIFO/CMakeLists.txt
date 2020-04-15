@@ -12,3 +12,4 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # 包含子项目。
 add_subdirectory ("FIFO_CLIENT")
 add_subdirectory("FIFO_SERVER")
+add_subdirectory("DICCLIENT")

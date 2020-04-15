@@ -1,4 +1,11 @@
 #include	"pipe.h"
+template<class T>
+int length(T& arr)
+{
+	//cout << sizeof(arr[0]) << endl;
+	//cout << sizeof(arr) << endl;
+	return sizeof(arr) / sizeof(arr[0]);
+}
 pipeBase::pipeBase()
 {
 }
@@ -76,7 +83,7 @@ pipeClient::pipeClient(LPCWSTR pipe_name)
     
 }
 
-bool	pipeBase::read(char buf[])//接收数据，并计数
+bool	pipeBase::read(char buf[], DWORD	len)//接收数据，并计数
 {
     if (!this->connectStatus)
     {
@@ -84,10 +91,11 @@ bool	pipeBase::read(char buf[])//接收数据，并计数
     }
     //char buf[256] = "Hello Pipe";
     DWORD rlen = 0;
-    if (ReadFile(hPipe, buf, 256, &rlen, NULL) == FALSE)//读取管道中的内容（管道是一种特殊的文件）
+    if (ReadFile(hPipe, buf, len, &rlen, NULL) == FALSE)//读取管道中的内容（管道是一种特殊的文件）
     {
-        //CloseHandle(hPipe);//关闭管道
+        CloseHandle(hPipe);//关闭管道
         connectStatus = false;
+        cout << "读失败，关闭！" << endl;
         return  false;
     }
     else
@@ -97,7 +105,7 @@ bool	pipeBase::read(char buf[])//接收数据，并计数
 
     return  true;
 }
-bool	pipeBase::send(char buf[])//数组里面的数据全发送
+bool	pipeBase::send(char buf[], DWORD	len)//数组里面的数据全发送
 {
     if (!connectStatus)
     {
@@ -105,11 +113,12 @@ bool	pipeBase::send(char buf[])//数组里面的数据全发送
     }
     DWORD   wlen = 0;
     bool    ret = false;
-    ret = WriteFile(hPipe, buf, sizeof(buf), &wlen, 0);
+    ret = WriteFile(hPipe, buf, len, &wlen, 0);
     if (!ret)
     {
         //CloseHandle(hPipe);//关闭管道
         connectStatus = false;
+        cout << "写失败，关闭！" << endl;
         return  false;
     }
     cout << "Send:" << buf << endl;

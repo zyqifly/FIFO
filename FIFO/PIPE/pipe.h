@@ -9,8 +9,8 @@ class pipeBase
 public:
 	pipeBase();
 	~pipeBase();
-	virtual	bool	read(char	buf[]);
-	virtual	bool	send(char	buf[]);
+	virtual	bool	read(char	buf[],DWORD	len);
+	virtual	bool	send(char	buf[],DWORD	len);
 	virtual	void	close();
 	virtual	bool	connect();
 	bool	connectStatus = false;

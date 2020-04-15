@@ -31,7 +31,7 @@ int main()
         }
         else
         {
-            char    data[] = "hello Pipe123123123123123!";
+            char    data[] = ":hello Pipeasdfasfasdfasdfasfdasdf!";
             myClient->send(data,sizeof(data));
             Sleep(1000);
             char    data1[256] = {};

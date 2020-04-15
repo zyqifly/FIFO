@@ -31,10 +31,10 @@ int main()
     }
     while (myServer->connectStatus)
     {
-        char    data[256] = "hello pipe!";
-        myServer->read(data);
-        char data1[256] = "recieved!";
-        myServer->send(data1);
+        char    data[256] = {};
+        myServer->read(data,sizeof(data));
+        //char data1[256] = "recieved!";
+        myServer->send(data,sizeof(data));
     }
     myServer->close();
     cout << "已经退出！" << endl;
