@@ -20,22 +20,50 @@ int main()
         int a = 0;
         cout << "输入1继续。。。" << endl;
         cin >> a;
-        if (a!=1)
+        if (a==0)
         {
             myClient->close();
             return  0;
         }
         if (!myClient->connectStatus)//如果一开始没连接上，那就一直等待
         {
+            myClient->connect();
             continue;
         }
         else
         {
-            char    data[] = ":hello Pipeasdfasfasdfasdfasfdasdf!";
-            myClient->send(data,sizeof(data));
-            Sleep(1000);
-            char    data1[256] = {};
-            myClient->read(data1,sizeof(data1));
+            if (a==1)
+            {
+                char    data[] = ":auto";
+                myClient->send(data, sizeof(data));
+                continue;
+            }
+            else if (a==2)
+            {
+                char    data[] = ":stop";
+                myClient->send(data, sizeof(data));
+                continue;
+            }
+            else  if (a==3)
+            {
+                char    data[] = ":req";
+                myClient->send(data, sizeof(data));
+                Sleep(1000);
+                //char    data1[256] = {};
+                //myClient->read(data1, sizeof(data1));
+                continue;
+            }
+            else
+            {
+                char    data[] = "hello";
+                myClient->send(data, sizeof(data));
+                Sleep(1000);
+                char    data1[256] = {};
+                myClient->read(data1, sizeof(data1));
+                continue;
+            }
+            
+            
         }
        
         if (!myClient->connectStatus)
